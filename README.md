@@ -2,6 +2,8 @@
 
 A tool to parse expression and form an expression tree. Can be used to understand complex If-Else conditions/ Algorithm studies / compiler design studies.
 
+***It uses L-R paring technique and created tree using top down approach.***
+
 ![image](https://user-images.githubusercontent.com/22127564/113579383-da091100-9641-11eb-906a-26cce4a64954.png)
 
 
