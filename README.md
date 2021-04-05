@@ -1,4 +1,4 @@
-# Expression-Parser-Tree-Creator
+# Expression-Evaluator-Tree-Creator
 
 A tool to parse expression and form an expression tree. Can be used to understand complex If-Else conditions/ Algorithm studies / compiler design studies.
 
