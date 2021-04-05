@@ -1,0 +1,240 @@
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<link href="https://unpkg.com/treeflex/dist/css/treeflex.css" rel="stylesheet">
+  
+</head>
+<script>
+
+		//parsing logic for each criteria
+var parse = function(num,content){
+   if(num != 0){
+	   //it's the next expression
+	   console.log('Result till '+num);
+	   add('Result till '+num);
+   }
+   
+   content = content.trim();
+   //a critera can have either && or ||
+   //lets for && first
+   if(content.includes('&&') == false && content.includes('||') == false) {
+		
+	   var arrayWithSpace = content.split(' '); 
+	   if(arrayWithSpace[0] == undefined || arrayWithSpace[1] == undefined || arrayWithSpace[2] == undefined ) return;
+	   console.log('Operand : '+ arrayWithSpace[0] +' | Operator : '+arrayWithSpace[1] + ' | Value : '+arrayWithSpace[2]);
+	   add(content);
+	}
+	else if(content.includes('&&')){
+	   var arrayWithAND = content.split('&&');
+	  
+	   for(var index = 0; index < arrayWithAND.length ; index++){
+		   if(arrayWithAND[index].trim() == ''){
+			   console.log('&&');
+			   add('&&');
+			   continue;
+		   }
+		   
+		   //check for || now
+		   var arrayWithOR = arrayWithAND[index].split('||');
+		  
+		 //  console.log('OR : '+arrayWithOR);
+		   for(var index2 = 0; index2 < arrayWithOR.length ; index2++){
+			   var string = arrayWithOR[index2].trim();
+			   if(string == '') {
+				   console.log('||');
+				   add('||')
+				   continue;
+			   }
+			   var arrayWithSpace = string.split(' ');
+			 
+			   console.log('Operand : '+ arrayWithSpace[0] +' | Operator : '+arrayWithSpace[1] + ' | Value : '+arrayWithSpace[2]);
+			   add(string);
+			   if(index2 + 1 != arrayWithOR.length){
+					console.log('||');
+					add('||');
+			   }
+		   }
+		   if(index + 1 != arrayWithAND.length){
+			   console.log('&&');
+			   add('&&');
+		   }
+		
+	   }
+   }
+   else{
+		var arrayWithOR = content.split('||');
+	  
+	   for(var index = 0; index < arrayWithOR.length ; index++){
+		   if(arrayWithOR[index].trim() == ''){
+			   console.log('||');
+			   add('||');
+			   continue;
+		   }
+		   
+		   //check for || now
+		   var arrayWithAND = arrayWithOR[index].split('&&');
+		  
+		 //  console.log('OR : '+arrayWithAND);
+		   for(var index2 = 0; index2 < arrayWithAND.length ; index2++){
+			   var string = arrayWithAND[index2].trim();
+			   if(string == '') {
+				   console.log('&&');
+				   add('&&')
+				   continue;
+			   }
+			   var arrayWithSpace = string.split(' ');
+			 
+			   console.log('Operand : '+ arrayWithSpace[0] +' | Operator : '+arrayWithSpace[1] + ' | Value : '+arrayWithSpace[2]);
+			   add(string);
+			   if(index2 + 1 != arrayWithAND.length){
+					console.log('&&');
+					add('&&');
+			   }
+		   }
+		   if(index + 1 != arrayWithOR.length){
+			   console.log('||');
+			   add('||');
+		   }
+		
+	   }
+   }
+   
+};
+
+		var isValid = function(s) {
+		var stack = [];
+		var index = 0;
+		var num = 0;
+		var content = '';
+	
+		//base condition, to check the start
+		if(s[index] != '(' && s[index] != '[' && s[index] != '{') {
+			//of no bracket found just return
+			console.log('Not a valid String '+s[index] + ' at index '+index);
+			add('Not a valid String '+s[index] + ' at index '+index);
+			return;
+		}
+		else{
+			//else push it in stack
+			stack.push(s[index]);
+			index++;
+		}
+		  while (s[index] != null) {
+		   
+		   //check if it is an opening
+		   if(s[index] == '(' || s[index] == '[' || s[index] == '{'){
+			 
+			   //push it
+			   stack.push(s[index]);
+		   }
+		   //if it is a closing
+		   else if(s[index] == ')' || s[index] == ']' || s[index] == '}'){
+			   //take the top
+			   var topElement = stack[stack.length - 1];
+			   var currentElement = s[index];
+			   //and compare the closing with top. if it is valid
+			   if((topElement == '(' && currentElement == ')') || ( topElement == '[' && currentElement == ']' ) || (topElement == '{' && currentElement == '}')){
+				   //valid, remove the top element
+			
+				   stack.pop();
+				   console.log(topElement);
+				   add(topElement);
+				   parse(num,content);
+				   console.log(currentElement);
+				   add(currentElement);
+				   num++;
+
+				   content = '';
+				   
+			   }//else string is defective, not needt to process
+			   else{
+				   console.log('Not a valid String '+s[index] + ' at index '+index);
+				   add('Not a valid String '+s[index] + ' at index '+index);
+				   return;
+			   }
+		   }
+		   else{
+			   //save the content, betwwen the openeing and closing
+			   content += s[index];
+		   }
+		   
+		   index++;
+		  }
+		  
+		};
+
+		function createTree(){
+			var expression = document.getElementById('expression').value;
+			
+			clear();
+			if(expression == undefined || expression == null || expression == "" || expression.trim() ==""){
+				$('#result').append('<span>Please provide some input!</span></br>');
+				return;
+			}
+			isValid(expression);
+			createView();
+		}
+		
+		function createView(){
+
+			var node = '<ul><li><span class="tf-nc">Final Result</span><ul>';
+	
+			var tempNodes = [];
+			var foundClosing = false;
+			var i;
+			for(i = contentArray.length - 1 ; i >= 0 ; i--){
+					if(contentArray[i].includes(')') || contentArray[i].includes(']') || contentArray[i].includes('}')){
+					
+						foundClosing = true;
+						continue;
+					}
+					
+					if(contentArray[i].includes('(') || contentArray[i].includes('[') || contentArray[i].includes('{')){
+						foundClosing = false;
+						continue;
+					}
+					
+					if(foundClosing){
+							tempNodes.push('<span class="tf-nc">'+contentArray[i]+'</span>');
+					}
+			}
+			var count = 0;
+			for(item in tempNodes){
+					
+					if(tempNodes[item].includes("Result")){
+							node += '<li>'+tempNodes[item]+'<ul>';
+							count++;
+					}else{
+						node += '<li>'+tempNodes[item]+'</li>';
+					}
+					
+			}
+			
+			while(count > 0){
+				node += '</ul></li>';
+				count--;
+			}
+			node +='</ul></li></ul>';
+			
+			
+			$('#result').append(node);
+			
+			console.log(node);
+		}
+
+		function add(item){
+			
+			//$('#result').append('<span>'+item+'</span></br>');
+			contentArray.push(item);
+		}
+
+		function clear(){
+			$('#result').empty();
+			contentArray = [];
+		}
+</script>
+<textarea id="expression" placeholder="( ( [a > 1] && c == 3 )|| d == 4)"></textarea></br>
+<button onclick="createTree()"> Create Tree </button></br>
+</br>
+<div id="result" class="tf-tree">
+</div>
+
