@@ -204,9 +204,19 @@ var parse = function(num,content){
 							node += '<li>'+tempNodes[item]+'<ul>';
 							count++;
 					}else{
-						node += '<li>'+tempNodes[item]+'</li>';
+						var str = tempNodes[item].substring(20);
+						str = str.replaceAll("</span>","");
+						var opArray = str.trim().split(" ");
+			
+						if(opArray.length == 3){
+							node += '<li><span class="tf-nc">EXP</span><ul><li><span class="tf-nc">'+opArray[0]+'</span></li>';
+							node += '<li><span class="tf-nc">'+opArray[1]+'</span></li>';
+							node += '<li><span class="tf-nc">'+opArray[2]+'</span></li></ul></li>';
+						}
+						else{
+							node += '<li>'+tempNodes[item]+'</li>';
+						}
 					}
-					
 			}
 			
 			while(count > 0){
